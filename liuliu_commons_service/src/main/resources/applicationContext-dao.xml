@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/db01"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.liuliu.dao"></property>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="globalConfig" ref="globalConfig"></property>
+        <!-- 分页插件 -->
+        <property name="plugins">
+            <array>
+                <bean class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor"></bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean class="com.baomidou.mybatisplus.core.config.GlobalConfig" id="globalConfig">
+        <property name="dbConfig" ref="dbConfig"></property>
+    </bean>
+
+    <bean id="dbConfig" class="com.baomidou.mybatisplus.core.config.GlobalConfig.DbConfig">
+        <property name="idType" value="AUTO"></property>
+        <property name="tablePrefix" value="tb_"></property>
+        <property name="tableUnderline" value="true"></property>
+    </bean>
+
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"></tx:annotation-driven>
+</beans>
